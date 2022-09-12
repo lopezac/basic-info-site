@@ -1,39 +1,25 @@
-const fs = require("fs");
-const http = require("http");
+const express = require("express");
+const path = require("path");
 
-const server = http.createServer((req, res) => {
-  res.setHeader("Content-Type", "text/html");
+const app = express();
+const port = 3000;
 
-  let path = "./views/";
+app.use(express.static("styles"));
 
-  switch (req.url) {
-    case "/":
-      path += "index.html";
-      break;
-    case "/about":
-      path += "about.html";
-      break;
-    case "/contact-me":
-      path += "contact-me.html";
-      break;
-    case "/style.css":
-      res.setHeader("Content-Type", "text/css");
-      path = "./style.css";
-      break;
-    default:
-      res.statusCode = 404;
-      path += "404.html";
-      break;
-  }
-
-  fs.readFile(path, (err, data) => {
-    if (err) {
-      console.log(err);
-      res.end();
-    } else res.end(data);
-  });
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/views/index.html"));
 });
 
-server.listen(3000, () => {
-  console.log("Listening");
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, "/views/about.html"));
 });
+
+app.get("/contact-me", (req, res) => {
+  res.sendFile(path.join(__dirname, "/views/contact-me.html"));
+});
+
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "/views/404.html"));
+});
+
+app.listen(port);
